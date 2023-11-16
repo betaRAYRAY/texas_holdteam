@@ -1,8 +1,6 @@
 use rocket::serde::json::Json;
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
-    // TODO: Add Poker Logic Here... :)
-
     // Look over all players and find the one with the name textas hold'team
     let mut cardsvec = Vec::new();
     for player in &_table.players {
@@ -16,7 +14,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     }
 
     let mut communityCards = _table.community_cards.clone();
-    cardsvec.append(&mut communityCards);
+    //cardsvec.append(&mut communityCards);
     let cardslen = cardsvec.len();
 
     let mut sum = 0;
@@ -41,13 +39,13 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     }
 
     let normSum = sum / cardslen;
-    if (normSum > 9) {
+    if normSum > 10 {
         return crate::models::bet::Bet {
             bet: _table.minimum_raise,
         };
+    } else {
+        return crate::models::bet::Bet {
+            bet: _table.minimum_bet,
+        };
     }
-
-    return crate::models::bet::Bet {
-        bet: _table.minimum_bet,
-    };
 }
