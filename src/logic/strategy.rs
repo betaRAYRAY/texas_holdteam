@@ -1,9 +1,7 @@
 use rocket::serde::json::Json;
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
-    return crate::models::bet::Bet {
-        bet: _table.minimum_bet,
-    };
+    println!("Hallo");
     // Look over all players and find the one with the name textas hold'team
     let mut cardsvec = Vec::new();
     for player in &_table.players {
@@ -57,7 +55,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let mut sumCommunity = 0;
     let mut boolsuitCommunity = true;
-    for i in 0..communityCards.len() - 1 {
+    for i in 0..(communityCards.len() - 1) {
         // Add up all card ranks
         //let card_num = match cardsvec[i].rank {
         //    crate::models::rank::Rank::A => 14,
