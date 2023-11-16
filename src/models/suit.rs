@@ -1,9 +1,10 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub enum Suit {
     HEARTS,
     SPADES,
     CLUBS,
-    DIAMONDS
+    DIAMONDS,
 }
+

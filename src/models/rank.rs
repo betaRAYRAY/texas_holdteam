@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub enum Rank {
     #[serde(alias = "A")]
     A,
@@ -27,5 +27,6 @@ pub enum Rank {
     #[serde(alias = "3")]
     _3,
     #[serde(alias = "2")]
-    _2
+    _2,
 }
+

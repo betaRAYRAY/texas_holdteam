@@ -1,13 +1,13 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[derive(Debug, Deserialize, PartialEq, Eq, Clone)]
 pub enum PlayerStatusEnum {
     ACTIVE,
     FOLDED,
-    OUT
+    OUT,
 }
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Player {
     pub name: String,
     pub status: PlayerStatusEnum,
@@ -15,3 +15,4 @@ pub struct Player {
     pub bet: i32,
     pub cards: Option<Vec<crate::models::card::Card>>,
 }
+
