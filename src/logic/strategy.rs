@@ -8,7 +8,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let mut cardsvec = Vec::new();
     for player in &_table.players {
         if player.name == "Texas Hold'team" {
-            if _table.minimum_bet <= player.stack / 2 {
+            if _table.minimum_bet <= player.stack / 3 * 2 {
                 return crate::models::bet::Bet {
                     bet: _table.minimum_bet,
                 };
