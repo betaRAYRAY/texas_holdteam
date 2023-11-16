@@ -2,6 +2,9 @@ use rocket::serde::json::Json;
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
     println!("Hallo");
+    return crate::models::bet::Bet {
+        bet: _table.minimum_bet,
+    };
     // Look over all players and find the one with the name textas hold'team
     let mut cardsvec = Vec::new();
     for player in &_table.players {
