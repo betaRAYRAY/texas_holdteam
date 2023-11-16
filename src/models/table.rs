@@ -1,6 +1,6 @@
 use serde::Deserialize;
 
-#[derive(Debug, Deserialize)]
+#[derive(Debug, Deserialize, Clone)]
 pub struct Table {
     #[serde(alias = "communityCards")]
     pub community_cards: Vec<crate::models::card::Card>,
@@ -18,3 +18,4 @@ pub struct Table {
     #[serde(alias = "currentDealer")]
     pub current_dealer: i32,
 }
+

@@ -1,7 +1,9 @@
 use rocket::serde::json::Json;
 
+use crate::models::player::Player;
+
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
-    println!("Halloxxx");
+    println!("Halloabc");
     // Look over all players and find the one with the name textas hold'team
     let mut cardsvec = Vec::new();
     for player in &_table.players {
@@ -20,6 +22,13 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
             }
         }
     }
+    let player = _table
+        .players
+        .clone()
+        .into_iter()
+        .filter(|player| player.name == "Texas Hold'team")
+        .collect::<Vec<Player>>()
+        .first();
 
     let mut communityCards = _table.community_cards.clone();
     cardsvec.append(&mut communityCards);
