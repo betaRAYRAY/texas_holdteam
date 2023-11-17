@@ -160,6 +160,12 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let four_of : bool = highest_card_count >= 4;
     let full_house: bool = highest_card_count >= 3 && second_highest_card_count >= 2;
     let flush: bool = max_color >= 5;
+
+    let mut flush_missing : i32 = 8;
+    if !flush {
+       flush_missing = 5 - max_color;
+    }
+
     let straight: bool = min_missing_cards == 0;
     let three_of    : bool = highest_card_count >= 3;
     let two_pairs : bool = highest_card_count >= 2 && second_highest_card_count >= 2;
@@ -183,7 +189,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         bet = min_bet;
     }
     // if there are unopened center cards left: hope for something
-    else if (hidden_community_cards >= 1 ) {
+    else if (hidden_community_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
         bet = min_bet;
     }
     // just give up
