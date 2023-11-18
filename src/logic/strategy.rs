@@ -310,7 +310,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
         // good cards -> go completely bonkers
         if (four_of || full_house || flush || straight) {
-            println!(" -> go bonkers");
+            println!(" -> go bonkers (fore_of: {}, full_house: {}, flush: {}, straight: {})", four_of, full_house, flush, straight);
             bet = max_bet;
         }
         // not so bad, stay in
