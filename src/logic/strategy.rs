@@ -213,22 +213,50 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let mut encounters: i32 = 0;
     let mut shit_starting_hand: bool = true;
+
+    let mut chen_score: f32 = 0.0;
     
      
     if (hidden_community_cards == 5) {
-        for i in (0..13) {
-            if number[i] > 1 && i >= 10 {
-                shit_starting_hand = false;
+        // 1. score highest card
+        if (highest_card_value == 12) {
+            chen_score += 10.0
+        }
+        else if (highest_card_value == 11) {
+            chen_score += 8.0
+        }
+        else if (highest_card_value == 10) {
+            chen_score += 7.0
+        }
+        else if (highest_card_value == 9) {
+            chen_score += 6.0
+        }
+        else {
+            chen_score += highest_card_value as f32 / 2.0
+        }
+
+        // 2. pair points
+        if (highest_card_count == 2) {
+            chen_score = chen_score * 2.0;
+
+            if (chen_score < 5.0) {
+                chen_score = 5.0;
             }
         }
 
-        if shit_starting_hand {
-            for i in (0..4) {
-                if fucking_color_shit[i].1 == 2 {
-                    
-                    let mut i_abs = -100;
+        // 3. add points for suited cards
+        if max_color == 2 { 
+            chen_score += 2.0;
+        }
+
+        // 4. subtract points for gaps
+        let mut abstand = 69;
+
+        if (highest_card_count != 2) {
+
+            let mut i_abs = -100;
                     for i in (0..13) {
-                        if number[i] ==1  && i_abs == -100 && i >= 5{
+                        if number[i] ==1  && i_abs == -100{
                             i_abs = -(i as i32);
                         }
                         else if number[i] > 0{
@@ -236,17 +264,36 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
                         }
                     }
                     
+                    i_abs -= 1;
+
                     if i_abs == 1 {
-                        shit_starting_hand = false;
+                        chen_score -= 1.0;
                     }
-                }
-            }
+                    else if i_abs == 2 {
+                        chen_score -= 2.0;
+                    }
+                    else if i_abs == 3 {
+                        chen_score -= 4.0;
+                    }
+                    else if i_abs >=4 {
+                        chen_score -= 5.0;
+                    }
 
+                    abstand = i_abs;
+        }
 
+        // 5. gap 0/1 and both cards < 10
+       if (abstand < 2) && highest_card_value < 10 {
+            chen_score += 1.0;
+       }
+
+       chen_score = (chen_score - 0.1).ceil();
+        
+        if (chen_score >= 8.0) {
+            shit_starting_hand = false;
         }
 
     }
-
 
     
     let mut we_have_not_complete_shit: bool = false;
@@ -285,7 +332,10 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     else if (active_player_count <= 3 && we_have_not_complete_shit) {
         bet = min_bet;
     }
-    else if (hidden_community_cards > 4 && !shit_starting_hand) {
+    else if (hidden_community_cards == 5 && !shit_starting_hand) {
+        bet = min_bet;
+    }
+    else if (hidden_community_cards == 3 || hidden_community_cards == 4) {
         bet = min_bet;
     }
     // just give up
