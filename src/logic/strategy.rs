@@ -280,6 +280,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
             shit_starting_hand = false;
         }
 
+        println!("CHEN:{}", chen_score);
+
     }
 
     
