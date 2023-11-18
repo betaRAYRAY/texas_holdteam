@@ -319,8 +319,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
                 bet = min_raise;
             }
             else {
-                println!(" -> hope, fold");
-                bet = 0;
+                println!(" -> hope, continue");
+                bet = min_bet;
             }
         }
         else if (active_player_count <= 3 && we_have_not_complete_shit) {
@@ -335,10 +335,10 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
             println!(" -> min bet because mid game");
             bet = min_bet;
         }
-        // just give up
+        // never give up
         else {
-            println!(" -> just give up");
-            bet = 0;
+            println!(" -> never give up");
+            bet = min_bet;
         }
     }
 
