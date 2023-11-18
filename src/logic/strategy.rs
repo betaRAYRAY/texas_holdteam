@@ -337,8 +337,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         }
         // never give up
         else {
-            println!(" -> never give up");
-            bet = min_bet;
+            println!(" -> sometimes give up");
+            bet = 0;
         }
     }
 
