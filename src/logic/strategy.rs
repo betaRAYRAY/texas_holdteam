@@ -161,7 +161,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let us = us.unwrap();
     let min_bet = _table.minimum_bet;
     let min_raise = _table.minimum_raise;
-    let max_bet = us.stack;
+    
     // fuck royal flush and straight flush, nobody gets that and we go all-in anyways
     let four_of : bool = highest_card_count >= 4;
     let full_house: bool = highest_card_count >= 3 && second_highest_card_count >= 2;
@@ -179,6 +179,13 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let active_player_count = _table.players.clone().into_iter().filter(|player| player.status != crate::models::player::PlayerStatusEnum::OUT).collect::<Vec<Player>>().len();
 
+    let players = _table.players.clone().into_iter().filter(|player| player.name != "Texas Hold'Team").collect::<Vec<Player>>();
+    let mut max_opponent_stack: i32 = 0;
+    for p in players {
+        if (p.stack > max_opponent_stack) {
+            max_opponent_stack = p.stack;
+        }
+    } 
 
     let nemesis_binding = _table.players.clone().into_iter().filter(|player| player.name == "Team42").collect::<Vec<Player>>();
     let nemesis: Option<&Player> = nemesis_binding.first();
@@ -188,6 +195,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let nemesis_raise : bool = nemesis_bet > min_bet;
 
     let nemesis_all_in : bool = nemesis_bet == nemesis.unwrap().stack;
+
+    let max_bet = core::cmp::max(core::cmp::min(max_opponent_stack, us.stack), min_bet);
 
 
     let mut highest_card: i32 = 0;
