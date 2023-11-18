@@ -3,7 +3,7 @@ use rocket::serde::json::Json;
 use crate::models::player::{Player, PlayerStatusEnum};
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
-    println!("Table: {:?}", _table);
+    //println!("Table: {:?}", _table);
 
     // number of hidden community cards
     let mut hidden_community_cards: i32 = 5 - _table.community_cards.len() as i32;
@@ -225,24 +225,24 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         if nemesis_all_in {
             bet = 0;
         } else {
-        bet = min_bet + min_raise;
+        bet = min_bet;
         }
     }
 
     // if there are unopened center cards left: hope for something
-    else if (min_missing_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
+    else if ((min_missing_cards <= 2 || flush_missing <= 2 ) && hidden_community_cards >= 3) {
         if nemesis_raise {
             bet = 0;
         } 
         else if (active_player_count <= 3 && we_have_not_complete_shit) {
-            bet = min_bet + min_raise;
+            bet = min_raise;
         }
         else {
-            bet = min_bet;
+            bet = 0;
         }
     }
     else if (active_player_count <= 3 && we_have_not_complete_shit) {
-        bet = min_bet + min_raise;
+        bet = min_bet;
     }
     // just give up
     else {
@@ -250,6 +250,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     }
 
     println!("Our Bet: {:?}", bet);
+
 
     return crate::models::bet::Bet{bet: bet};
 
