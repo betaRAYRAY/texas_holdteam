@@ -307,7 +307,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
                 bet = 0;
             } else {
                 println!(" -> not so bad");
-                bet = min_bet;
+                bet = min_raise;
             }
         }
         // if there are unopened center cards left: hope for something
@@ -339,9 +339,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         }
         // sometimes give up
         else {
-            println!(" -> sometimes give up");
-            
-            if (highest_card_count == 2 && highest_card_value >= 10) {
+            println!(" -> never give up");
+            {
                 bet = min_bet;
             }
         }
