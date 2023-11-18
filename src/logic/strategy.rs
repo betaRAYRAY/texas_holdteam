@@ -306,6 +306,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let mut bet = 0;
 
+if (active_player_count < 8) {
+
     // good cards -> go completely bonkers
     if (four_of || full_house || flush || straight) {
         println!(" -> go bonkers");
@@ -353,6 +355,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         println!(" -> just give up");
         bet = 0;
     }
+}
 
     println!("Wir sind die Besten!");
 
