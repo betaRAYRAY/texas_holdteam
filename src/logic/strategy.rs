@@ -302,7 +302,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         we_have_not_complete_shit = true;
     }
 
-    print!("Active players: {}, hidden community cards: {}", active_player_count, hidden_community_cards);
+    print!("Active players: {}, community cards: {}", active_player_count, _table.community_cards.len() as i32);
 
     let mut bet = 0;
 
