@@ -1,4 +1,6 @@
 use rocket::serde::json::Json;
+use rand::prelude::*;
+
 
 use crate::models::player::{Player, PlayerStatusEnum};
 
@@ -338,7 +340,10 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         // sometimes give up
         else {
             println!(" -> sometimes give up");
-            bet = 0;
+            
+            if rand::random() {
+                bet = 0;
+            }
         }
     }
 

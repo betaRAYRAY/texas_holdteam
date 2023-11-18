@@ -16,6 +16,9 @@ features = ["json"]
 version = "1.0.192"
 features = []
 
+[dependencies]
+rand="0.8.5"
+
 [[bin]]
 edition = "2021"
 name = "player-rust-rocket"
