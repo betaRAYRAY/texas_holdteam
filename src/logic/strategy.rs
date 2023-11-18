@@ -1,6 +1,6 @@
 use rocket::serde::json::Json;
 
-use crate::models::player::Player;
+use crate::models::player::{Player, PlayerStatusEnum};
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
     println!("Table: {:?}", _table);
@@ -119,7 +119,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     for i in 0..13 {
         if (number[i] >= second_highest_card_value) && (i as i32 != highest_card_value) {
-            second_highest_card_value = number[i];
+            second_highest_card_count = number[i];
             second_highest_card_value = i as i32;
         }
     }
@@ -160,6 +160,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let us: Option<&Player> = binding.first();
     let us = us.unwrap();
     let min_bet = _table.minimum_bet;
+    let min_raise = _table.minimum_raise;
     let max_bet = us.stack;
     // fuck royal flush and straight flush, nobody gets that and we go all-in anyways
     let four_of : bool = highest_card_count >= 4;
@@ -176,6 +177,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let two_pairs : bool = highest_card_count >= 2 && second_highest_card_count >= 2;
     // fuck pair highest_card, worthless shit
 
+    let active_player_count = _table.players.clone().into_iter().filter(|player| player.status != crate::models::player::PlayerStatusEnum::OUT).collect::<Vec<Player>>().len();
+
 
     let nemesis_binding = _table.players.clone().into_iter().filter(|player| player.name == "Team42").collect::<Vec<Player>>();
     let nemesis: Option<&Player> = nemesis_binding.first();
@@ -185,6 +188,21 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let nemesis_raise : bool = nemesis_bet > min_bet;
 
     let nemesis_all_in : bool = nemesis_bet == nemesis.unwrap().stack;
+
+
+    let mut highest_card: i32 = 0;
+    for i in 0..13 {
+        if number[i] != 0 {
+            highest_card = i as i32;
+        }
+
+        }
+    
+    let mut we_have_not_complete_shit: bool = false;
+
+    if (highest_card_count >= 2 && highest_card_value >= 10 || highest_card >= 12) {
+        we_have_not_complete_shit = true;
+    }
 
 
     let mut bet = 0;
@@ -198,17 +216,24 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         if nemesis_all_in {
             bet = 0;
         } else {
-        bet = min_bet;
+        bet = min_bet + min_raise;
         }
     }
 
     // if there are unopened center cards left: hope for something
-    else if ( min_missing_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
+    else if (min_missing_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
         if nemesis_raise {
             bet = 0;
-        } else {
+        } 
+        else if (active_player_count <= 3 && we_have_not_complete_shit) {
+            bet = min_bet + min_raise;
+        }
+        else {
             bet = min_bet;
         }
+    }
+    else if (active_player_count <= 3 && we_have_not_complete_shit) {
+        bet = min_bet + min_raise;
     }
     // just give up
     else {
