@@ -341,7 +341,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         else {
             println!(" -> sometimes give up");
             
-            if highest_card_count == 2 || highest_card_value >= 11 {
+            if (highest_card_count == 2 && highest_card_value >= 10) {
                 bet = min_bet;
             }
         }
