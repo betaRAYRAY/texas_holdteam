@@ -249,6 +249,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         bet = 0;
     }
 
-return crate::models::bet::Bet{bet: bet};
+    println!("Our Bet: {:?}", bet);
+
+    return crate::models::bet::Bet{bet: bet};
 
 }
