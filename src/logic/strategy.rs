@@ -306,56 +306,56 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let mut bet = 0;
 
-if (active_player_count < 8) {
+    if (active_player_count < 8) {
 
-    // good cards -> go completely bonkers
-    if (four_of || full_house || flush || straight) {
-        println!(" -> go bonkers");
-        bet = max_bet;
-    }
-    // not so bad, stay in
-    else if (three_of || two_pairs) {
-        if nemesis_all_in {
-            println!(" -> not so bad, but fold because nemesis all in");
-            bet = 0;
-        } else {
-            println!(" -> not so bad");
+        // good cards -> go completely bonkers
+        if (four_of || full_house || flush || straight) {
+            println!(" -> go bonkers");
+            bet = max_bet;
+        }
+        // not so bad, stay in
+        else if (three_of || two_pairs) {
+            if nemesis_all_in {
+                println!(" -> not so bad, but fold because nemesis all in");
+                bet = 0;
+            } else {
+                println!(" -> not so bad");
+                bet = min_bet;
+            }
+        }
+        // if there are unopened center cards left: hope for something
+        else if ((min_missing_cards <= 2 || flush_missing <= 2 ) && hidden_community_cards >= 3) {
+            if nemesis_raise {
+                println!(" -> hope, but fold because nemesis raise");
+                bet = 0;
+            } 
+            else if (active_player_count <= 3 && we_have_not_complete_shit) {
+                println!(" -> hope, raise because player count and not complete shit");
+                bet = min_raise;
+            }
+            else {
+                println!(" -> hope, fold");
+                bet = 0;
+            }
+        }
+        else if (active_player_count <= 3 && we_have_not_complete_shit) {
+            println!(" -> min bet because player count and not complete shit");
             bet = min_bet;
         }
-    }
-    // if there are unopened center cards left: hope for something
-    else if ((min_missing_cards <= 2 || flush_missing <= 2 ) && hidden_community_cards >= 3) {
-        if nemesis_raise {
-            println!(" -> hope, but fold because nemesis raise");
-            bet = 0;
-        } 
-        else if (active_player_count <= 3 && we_have_not_complete_shit) {
-            println!(" -> hope, raise because player count and not complete shit");
-            bet = min_raise;
+        else if (hidden_community_cards == 5 && !shit_starting_hand) {
+            println!(" -> min bet because round start and not shit starting hand");
+            bet = min_bet;
         }
+        else if (hidden_community_cards == 3 || hidden_community_cards == 4) {
+            println!(" -> min bet because mid game");
+            bet = min_bet;
+        }
+        // just give up
         else {
-            println!(" -> hope, fold");
+            println!(" -> just give up");
             bet = 0;
         }
     }
-    else if (active_player_count <= 3 && we_have_not_complete_shit) {
-        println!(" -> min bet because player count and not complete shit");
-        bet = min_bet;
-    }
-    else if (hidden_community_cards == 5 && !shit_starting_hand) {
-        println!(" -> min bet because round start and not shit starting hand");
-        bet = min_bet;
-    }
-    else if (hidden_community_cards == 3 || hidden_community_cards == 4) {
-        println!(" -> min bet because mid game");
-        bet = min_bet;
-    }
-    // just give up
-    else {
-        println!(" -> just give up");
-        bet = 0;
-    }
-}
 
     println!("Wir sind die Besten!");
 
