@@ -156,6 +156,11 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     
     // all possible combinations in descending order of worth
 
+    let binding = _table.players.clone().into_iter().filter(|player| player.name == "Texas Hold'team").collect::<Vec<Player>>();
+    let us: Option<&Player> = binding.first();
+    let us = us.unwrap();
+    let min_bet = _table.minimum_bet;
+    let max_bet = us.stack;
     // fuck royal flush and straight flush, nobody gets that and we go all-in anyways
     let four_of : bool = highest_card_count >= 4;
     let full_house: bool = highest_card_count >= 3 && second_highest_card_count >= 2;
@@ -171,9 +176,6 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let two_pairs : bool = highest_card_count >= 2 && second_highest_card_count >= 2;
     // fuck pair highest_card, worthless shit
 
-    let binding = _table.players.clone().into_iter().filter(|player| player.name == "Texas Hold'team").collect::<Vec<Player>>();
-    let us: Option<&Player> = binding.first();
-    let us = us.unwrap();
 
     let nemesis_binding = _table.players.clone().into_iter().filter(|player| player.name == "Team42").collect::<Vec<Player>>();
     let nemesis: Option<&Player> = nemesis_binding.first();
@@ -211,18 +213,27 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
 
     let mut bet = 0;
-    
+
     // good cards -> go completely bonkers
     if (four_of || full_house || flush || straight) {
         bet = max_bet;
     }
     // not so bad, stay in
     else if (three_of || two_pairs) {
+        if nemesis_all_in {
+            bet = 0;
+        } else {
         bet = min_bet;
+        }
     }
+
     // if there are unopened center cards left: hope for something
-    else if (hidden_community_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
-        bet = min_bet;
+    else if ( min_missing_cards <= hidden_community_cards || flush_missing <= hidden_community_cards || hidden_community_cards >= 3) {
+        if nemesis_raise {
+            bet = 0;
+        } else {
+            bet = min_bet;
+        }
     }
     // just give up
     else {
