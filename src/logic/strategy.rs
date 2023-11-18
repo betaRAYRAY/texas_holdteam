@@ -179,37 +179,12 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let nemesis_binding = _table.players.clone().into_iter().filter(|player| player.name == "Team42").collect::<Vec<Player>>();
     let nemesis: Option<&Player> = nemesis_binding.first();
+    
+    let nemesis_bet = nemesis.unwrap().bet;
 
-    let mut nemesis_is_player = false;
+    let nemesis_raise : bool = nemesis_bet > min_bet;
 
-    match nemesis {
-       Some(nemesis_player) =>  nemesis_is_player = true,
-       None => nemesis_is_player = false,
-    };
-
-    let nemesis_bet : i32= if nemesis_is_player {
-        let bet = nemesis.unwrap().bet;
-        return crate::models::bet::Bet {bet: bet};
-    } else {
-        let var_name = 0;
-        return crate::models::bet::Bet {bet: var_name};
-    };
-
-    let nemesis_raise : bool;
-
-    if nemesis_is_player {
-        nemesis_raise = nemesis_bet > min_bet;
-    } else {
-        nemesis_raise = false;
-    };
-
-    let nemesis_all_in : bool;
-
-    if nemesis_is_player {
-        nemesis_all_in = nemesis_bet == nemesis.unwrap().stack;
-    } else {
-        nemesis_is_player = false;
-    };
+    let nemesis_all_in : bool = nemesis_bet == nemesis.unwrap().stack;
 
 
     let mut bet = 0;
