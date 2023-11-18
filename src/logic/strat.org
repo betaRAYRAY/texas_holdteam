@@ -1,0 +1,39 @@
+#+title: Strat
+
+* Starting hands:
+** high pairs
+Completing a starting pair to a three of has a p ≅ 12%
+** low pairs
+risky
+** two high cards
+connected cards or suited cards: good
+** high low
+only good on low player count
+** low hands
+fold
+** 2 connected and suited
+only p ≅ 5,77%
+
+* preflop strats
+** middle positon very good hand
+Re-raise
+** earyl open with med to low hadn
+fold
+** late position, low player count and ok cards
+min_bet
+
+* Odds
+for each card on the hand calculate all possible good cards, check with the open cards and calculate likliehood of a good card in the remaining community cards.
+
+
+* hands
+** high pair of X
+|                    | open_cards - good cards |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
+|                    |                     0-0 | 1-0 | 1-1 | 2-0 | 2-1 | 2-2 | 3-0 | 3-1 | 3-2 | 3-3 | 4-0 | 4-1 | 4-2 | 4-3 | 4-4 |
+|--------------------+-------------------------+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----+-----|
+| #hidden_cards      |                       4 |   4 |   4 |   3 |   3 |   3 |   2 |   2 |   2 |   2 |   1 |   1 |   1 |   1 |   1 |
+| #hidden_good_cards |                         |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
+| #hidden_bad_cards  |                         |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
+| #good_cards        |                         |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
+| p_good card        |                         |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
+| move               |                         |     |     |     |     |     |     |     |     |     |     |     |     |     |     |
