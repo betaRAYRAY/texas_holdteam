@@ -23,19 +23,19 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
             for _card_vec in &_player.cards {
                 for _card in _card_vec {
                     match _card.rank {
-                        crate::models::rank::Rank::A => number[0] += 1,
-                        crate::models::rank::Rank::K => number[1] += 1,
-                        crate::models::rank::Rank::Q => number[2] += 1,
-                        crate::models::rank::Rank::J => number[3] += 1,
-                        crate::models::rank::Rank::_10 => number[4] += 1,
-                        crate::models::rank::Rank::_9 => number[5] += 1,
+                        crate::models::rank::Rank::A => number[12] += 1,
+                        crate::models::rank::Rank::K => number[11] += 1,
+                        crate::models::rank::Rank::Q => number[10] += 1,
+                        crate::models::rank::Rank::J => number[9] += 1,
+                        crate::models::rank::Rank::_10 => number[8] += 1,
+                        crate::models::rank::Rank::_9 => number[7] += 1,
                         crate::models::rank::Rank::_8 => number[6] += 1,
-                        crate::models::rank::Rank::_7 => number[7] += 1,
-                        crate::models::rank::Rank::_6 => number[8] += 1,
-                        crate::models::rank::Rank::_5 => number[9] += 1,
-                        crate::models::rank::Rank::_4 => number[10] += 1,
-                        crate::models::rank::Rank::_3 => number[11] += 1,
-                        crate::models::rank::Rank::_2 => number[12] += 1,
+                        crate::models::rank::Rank::_7 => number[5] += 1,
+                        crate::models::rank::Rank::_6 => number[4] += 1,
+                        crate::models::rank::Rank::_5 => number[3] += 1,
+                        crate::models::rank::Rank::_4 => number[2] += 1,
+                        crate::models::rank::Rank::_3 => number[1] += 1,
+                        crate::models::rank::Rank::_2 => number[0] += 1,
                     }
                 }
             }
@@ -63,24 +63,25 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         }
     } 
 
+   
     let tab_commie_cards_1 = _table.community_cards.clone();
     let tab_commie_cards_2 = _table.community_cards.clone();
     
         for _card in tab_commie_cards_1 {
             match _card.rank {
-                crate::models::rank::Rank::A => number[0] += 1,
-                crate::models::rank::Rank::K => number[1] += 1,
-                crate::models::rank::Rank::Q => number[2] += 1,
-                crate::models::rank::Rank::J => number[3] += 1,
-                crate::models::rank::Rank::_10 => number[4] += 1,
-                crate::models::rank::Rank::_9 => number[5] += 1,
+                crate::models::rank::Rank::A => number[12] += 1,
+                crate::models::rank::Rank::K => number[11] += 1,
+                crate::models::rank::Rank::Q => number[10] += 1,
+                crate::models::rank::Rank::J => number[9] += 1,
+                crate::models::rank::Rank::_10 => number[8] += 1,
+                crate::models::rank::Rank::_9 => number[7] += 1,
                 crate::models::rank::Rank::_8 => number[6] += 1,
-                crate::models::rank::Rank::_7 => number[7] += 1,
-                crate::models::rank::Rank::_6 => number[8] += 1,
-                crate::models::rank::Rank::_5 => number[9] += 1,
-                crate::models::rank::Rank::_4 => number[10] += 1,
-                crate::models::rank::Rank::_3 => number[11] += 1,
-                crate::models::rank::Rank::_2 => number[12] += 1,
+                crate::models::rank::Rank::_7 => number[5] += 1,
+                crate::models::rank::Rank::_6 => number[4] += 1,
+                crate::models::rank::Rank::_5 => number[3] += 1,
+                crate::models::rank::Rank::_4 => number[2] += 1,
+                crate::models::rank::Rank::_3 => number[1] += 1,
+                crate::models::rank::Rank::_2 => number[0] += 1,
             }
         }
 
@@ -100,6 +101,9 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
                 crate::models::suit::Suit::DIAMONDS => color[3].1 += 1,
             }
         }
+
+        let fucking_color_shit = color.clone();
+
 
     // find card with highest value in number, reassign for same-size larger-index
     let mut highest_card_value: i32 = 0;
@@ -206,6 +210,44 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         }
 
         }
+
+    let mut encounters: i32 = 0;
+    let mut shit_starting_hand: bool = true;
+    
+     
+    if (hidden_community_cards == 5) {
+        for i in (0..13) {
+            if number[i] > 1 && i >= 10 {
+                shit_starting_hand = false;
+            }
+        }
+
+        if shit_starting_hand {
+            for i in (0..4) {
+                if fucking_color_shit[i].1 == 2 {
+                    
+                    let mut i_abs = -100;
+                    for i in (0..13) {
+                        if number[i] ==1  && i_abs == -100 && i >= 5{
+                            i_abs = -(i as i32);
+                        }
+                        else if number[i] > 0{
+                            i_abs = i_abs + (i as i32);
+                        }
+                    }
+                    
+                    if i_abs == 1 {
+                        shit_starting_hand = false;
+                    }
+                }
+            }
+
+
+        }
+
+    }
+
+
     
     let mut we_have_not_complete_shit: bool = false;
 
@@ -228,8 +270,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         bet = min_bet;
         }
     }
-
-    // if there are unopened center cards left: hope for something
+      // if there are unopened center cards left: hope for something
     else if ((min_missing_cards <= 2 || flush_missing <= 2 ) && hidden_community_cards >= 3) {
         if nemesis_raise {
             bet = 0;
@@ -242,6 +283,9 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         }
     }
     else if (active_player_count <= 3 && we_have_not_complete_shit) {
+        bet = min_bet;
+    }
+    else if (hidden_community_cards > 4 && !shit_starting_hand) {
         bet = min_bet;
     }
     // just give up
