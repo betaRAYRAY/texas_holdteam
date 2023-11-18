@@ -276,7 +276,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
        chen_score = (chen_score - 0.1).ceil();
         
-        if (chen_score >= 8.0) {
+        if (chen_score >= 6.0) {
             shit_starting_hand = false;
         }
 
