@@ -179,7 +179,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let active_player_count = _table.players.clone().into_iter().filter(|player| player.status != crate::models::player::PlayerStatusEnum::OUT).collect::<Vec<Player>>().len();
 
-    let players = _table.players.clone().into_iter().filter(|player| player.name != "Texas Hold'Team").collect::<Vec<Player>>();
+    let players = _table.players.clone().into_iter().filter(|player| player.name != "Texas Hold'team").collect::<Vec<Player>>();
     let mut max_opponent_stack: i32 = 0;
     for p in players {
         if (p.stack > max_opponent_stack) {
