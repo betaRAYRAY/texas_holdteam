@@ -40,15 +40,6 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
                 }
             }
 
-            // fill vector strait 
-
-    for i in 0..13 {
-        if number[i] > 0  {
-            straight[i] = true;
-        }
-    }
-
-
             // fill vector color with the number of cards of the corresponding suit
             for _card_vec in &_player.cards {
                 for _card in _card_vec {
@@ -129,8 +120,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     }
 
     // check all windows of 5 cards in vector straight and find the window with the fewest false values
-    let mut min_missing_cards: i32 = 0;
-    let mut min_missing_cards_count: i32 = 0;
+    let mut min_missing_cards: i32 = 6;
 
     for i in 0..9 {
         let mut min_missing_cards_temp: i32 = 0;
@@ -140,13 +130,8 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
             }
         }
 
-        if min_missing_cards_temp == min_missing_cards {
-            min_missing_cards_count += 1;
-        }
-
         if min_missing_cards_temp < min_missing_cards {
             min_missing_cards = min_missing_cards_temp;
-            min_missing_cards_count = 1;
         }
     }
 
