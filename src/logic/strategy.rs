@@ -343,7 +343,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
         bet = 0;
     }
 
-    println!("Our Bet: {:?}", bet);
+    println!("Wir sind die Besten!");
 
 
     return crate::models::bet::Bet{bet: bet};
