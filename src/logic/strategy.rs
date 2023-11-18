@@ -291,7 +291,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     let mut bet = 0;
 
-    if (active_player_count < 7 || chen_score >= 12.0) {
+    if (active_player_count < 8 || chen_score >= 12.0) {
 
         // good cards -> go completely bonkers
         if (four_of || full_house || flush || straight) {
