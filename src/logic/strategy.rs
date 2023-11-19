@@ -36,10 +36,10 @@ pub fn decide(_table: Json<Table>) -> Bet {
     } else if winProbability > 1.0 / (activePlayerCount as f64) || us.stack == 0 {
         bet = _table.minimum_bet;
         betType = 'C';
-    } else if winProbability > 0.9 / (activePlayerCount as f64) && us.bet == 0 && _table.minimum_bet == 20 {
+    } /*else if winProbability > 0.9 / (activePlayerCount as f64) && us.bet == 0 && _table.minimum_bet == 20 {
         bet = _table.minimum_bet;
         betType = 'C';
-    } else {
+    }*/ else {
         bet = 0;
         betType = 'F';
     }
@@ -409,7 +409,7 @@ pub fn testSimulateWinProbability() {
 
     let mut rng = thread_rng();
 
-    for i in 0..20 {
+    for i in 0..3 {
         deck.shuffle(&mut rng);
         let p: f64 = simulateWinProbability(&vec![deck.pop().unwrap(), deck.pop().unwrap()], &vec![], 1);
         println!("p: {:.1}%", p * 100.0);
@@ -434,7 +434,7 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
     // simulate n games
     let n: i32 = 100000;
     let mut halfWins: i32 = 0;
-    for _i in 0..n {
+    'sim: for _i in 0..n {
         let mut deckTmp: Vec<Card> = deck.clone();
 
         // shuffle remaining cards in deck to enable random card drawing
@@ -450,18 +450,23 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
         ownCards.extend(hand);
         let ownScore: i32 = evaluateHand(&ownCards);
 
+        let mut tie: bool = false;
         for _j in 0..activeOpponentCount {
             let mut opponentCards: Vec<Card> = allCommunityCards.clone();
             opponentCards.extend(vec![deckTmp.pop().unwrap(), deckTmp.pop().unwrap()]);
             
             let opponentScore: i32 = evaluateHand(&opponentCards);
 
-            if (opponentScore == ownScore) {
-                halfWins += 1;
-            } else if ownScore > opponentScore {
-                halfWins += 2;
+            if opponentScore > ownScore {
+                continue 'sim;
+            }
+
+            if opponentScore == ownScore {
+                tie = true;
             }
         }
+
+        halfWins += if tie { 1 } else { 2 };
     }
 
     return (halfWins as f64) / (2.0 * (n as f64));
