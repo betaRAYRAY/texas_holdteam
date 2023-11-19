@@ -20,7 +20,7 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
     let winProbability: f64 = simulateWinProbability(hand, communityCards, activePlayerCount - 1);
     let simulationTime = simulationStart.elapsed();
 
-    println!("Opponent count: {}, win probability: {}, simulation time: {:?}", activePlayerCount - 1, winProbability, simulationTime);
+    println!("Opponent count: {}, community cards: {}, win probability: {}, simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability, simulationTime);
 
     //println!("Table: {:?}", _table);
 
