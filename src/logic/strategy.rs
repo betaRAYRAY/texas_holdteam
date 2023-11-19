@@ -34,7 +34,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
     } else if riskAdjustedScore > 0.1 {
         bet = _table.minimum_raise;
         betType = 'R';
-    } else if riskAdjustedScore > 0.0 || us.stack == 0 {
+    } else if riskAdjustedScore > -0.1 || us.stack == 0 {
         bet = _table.minimum_bet;
         betType = 'C';
     } else if winProbability / (activePlayerCount as f64) > 0.5 && communityCards.len() > 0 {
