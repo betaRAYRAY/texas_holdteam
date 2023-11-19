@@ -27,7 +27,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
 
     let bet;
     let betType: char;
-    let riskAdjustedScore: f64 = ((8.0 * winProbability - 1.0) * (activePlayerCount as f64) - 7.0) / 8.0;
+    let riskAdjustedScore: f64 = ((11.0 * winProbability - 1.0) * (activePlayerCount as f64) - 10.0) / 11.0;
     if riskAdjustedScore > 0.2 {
         bet = max(_table.minimum_raise, maxOpponentStack);
         betType = 'R';
