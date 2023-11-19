@@ -11,5 +11,7 @@ fn index(table: Json<models::table::Table>) -> Json<models::bet::Bet> {
 
 #[launch]
 fn rocket() -> _ {
+    //logic::strategy::testSimulateWinProbability();
+
     rocket::build().mount("/", routes![index])
 }

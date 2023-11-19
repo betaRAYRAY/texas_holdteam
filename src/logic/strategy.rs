@@ -399,6 +399,24 @@ pub fn decide(_table: Json<Table>) -> Bet {
 }
 
 
+pub fn testSimulateWinProbability() {
+    let mut deck: Vec<Card> = vec![];
+    for rank in Rank::iter() {
+        for suit in Suit::iter() {
+            deck.push(Card {rank, suit});
+        }
+    }
+
+    let mut rng = thread_rng();
+
+    for i in 0..20 {
+        deck.shuffle(&mut rng);
+        let p: f64 = simulateWinProbability(&vec![deck.pop().unwrap(), deck.pop().unwrap()], &vec![], 1);
+        println!("p: {:.1}%", p * 100.0);
+    }
+}
+
+
 fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOpponentCount: i32) -> f64 {
     // create deck with all cards which are not in the given cards
     let mut deck: Vec<Card> = vec![];
