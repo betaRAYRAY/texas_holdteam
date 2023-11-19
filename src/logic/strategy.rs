@@ -28,7 +28,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
     let bet;
     let betType: char;
     let riskAdjustedScore: f64 = ((11.0 * winProbability - 1.0) * (activePlayerCount as f64) - 10.0) / 11.0;
-    if communityCards.len() == 0 {
+    if communityCards.len() == 0 && winProbability / (activePlayerCount as f64) > 0.5 {
         bet = us.stack;
         betType = 'R';
     } else if riskAdjustedScore > 0.2 {
