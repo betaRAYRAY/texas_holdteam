@@ -385,17 +385,20 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
         }
     }
 
-    // shuffle remaining cards in deck to enable random card drawing
     let mut rng = thread_rng();
-    deck.shuffle(&mut rng);
 
     // simulate 10000 games
     let mut wins: i32 = 0;
     'sim: for _i in 0..10000 {
+        let mut deckTmp: Vec<Card> = deck.clone();
+
+        // shuffle remaining cards in deck to enable random card drawing
+        deckTmp.shuffle(&mut rng);
+
         // draw remaining community cards from the deck
         let mut allCommunityCards: Vec<Card> = communityCards.clone();
         for _j in 0..(5 - communityCards.len()) {
-            allCommunityCards.push(deck.pop().unwrap());
+            allCommunityCards.push(deckTmp.pop().unwrap());
         }
 
         let mut ownCards: Vec<Card> = allCommunityCards.clone();
@@ -404,7 +407,7 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
 
         for _j in 0..activeOpponentCount {
             let mut opponentCards: Vec<Card> = allCommunityCards.clone();
-            opponentCards.extend(vec![deck.pop().unwrap(), deck.pop().unwrap()]);
+            opponentCards.extend(vec![deckTmp.pop().unwrap(), deckTmp.pop().unwrap()]);
             
             let opponentScore: i32 = evaluateHand(&opponentCards);
             if opponentScore >= ownScore {
