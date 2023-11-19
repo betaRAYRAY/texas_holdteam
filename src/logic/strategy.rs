@@ -24,11 +24,11 @@ pub fn decide(_table: Json<Table>) -> Bet {
 
     let bet;
     let betType: char;
-    if winProbability > 0.7 / (activePlayerCount as f64) {
+    if winProbability > 1.5 / (activePlayerCount as f64) {
         let maxOpponentStack: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).map(|player| player.stack).max().unwrap_or(0);
         bet = maxOpponentStack;
         betType = 'R';
-    } else if winProbability > 0.5 / (activePlayerCount as f64) {
+    } else if winProbability > 1.0 / (activePlayerCount as f64) {
         bet = _table.minimum_bet;
         betType = 'C';
     } else {
