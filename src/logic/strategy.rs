@@ -415,8 +415,8 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
 
     // simulate n games
     let n: i32 = 100000;
-    let mut wins: i32 = 0;
-    'sim: for _i in 0..n {
+    let mut halfWins: i32 = 0;
+    for _i in 0..n {
         let mut deckTmp: Vec<Card> = deck.clone();
 
         // shuffle remaining cards in deck to enable random card drawing
@@ -437,15 +437,16 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
             opponentCards.extend(vec![deckTmp.pop().unwrap(), deckTmp.pop().unwrap()]);
             
             let opponentScore: i32 = evaluateHand(&opponentCards);
-            if opponentScore >= ownScore {
-                continue 'sim;
+
+            if (opponentScore == ownScore) {
+                halfWins += 1;
+            } else if ownScore > opponentScore {
+                halfWins += 2;
             }
         }
-
-        wins += 1;
     }
 
-    return (wins as f64) / (n as f64);
+    return (halfWins as f64) / (2.0 * (n as f64));
 }
 
 
@@ -466,7 +467,7 @@ fn evaluateHand(cards: &Vec<Card>) -> i32 {
         }
 
         if straightFlushCount == 5 {
-            return 800 + (i as i32);
+            return 800000 + (i as i32);
         }
     }
 
@@ -480,7 +481,16 @@ fn evaluateHand(cards: &Vec<Card>) -> i32 {
 
     // check for four of a kind
     if rankCount[mostCommonRank as usize] == 4 {
-        return 700 + mostCommonRank;
+        // find the kicker
+        let mut kicker: i32 = 0;
+        for i in (0..12).rev() {
+            if rankCount[i] != 4 {
+                kicker = i as i32;
+                break;
+            }
+        }
+
+        return 700000 + 13 * mostCommonRank + kicker;
     }
 
     // find second highest count of cards of the same rank
@@ -493,7 +503,7 @@ fn evaluateHand(cards: &Vec<Card>) -> i32 {
 
     // check for full house
     if rankCount[mostCommonRank as usize] == 3 && rankCount[secondMostCommonRank as usize] == 2 {
-        return 600 + mostCommonRank;
+        return 600000 + mostCommonRank;
     }
 
     // count number of cards of each suit
@@ -514,7 +524,7 @@ fn evaluateHand(cards: &Vec<Card>) -> i32 {
     if suitCount[mostCommonSuit as usize] >= 5 {
         for card in cards.iter().rev() {
             if card.suit as i32 == mostCommonSuit {
-                return 500 + (card.rank as i32);
+                return 500000 + (card.rank as i32);
             }
         }
     }
@@ -529,25 +539,51 @@ fn evaluateHand(cards: &Vec<Card>) -> i32 {
         }
 
         if straightCount == 5 {
-            return 400 + (i as i32);
+            return 400000 + (i as i32);
         }
     }
 
     // check for three of a kind
     if rankCount[mostCommonRank as usize] == 3 {
-        return 300 + mostCommonRank;
+        return 300000 + mostCommonRank;
+    }
+
+    // find the first kicker
+    let mut firstKicker: i32 = 0;
+    for i in (0..13).rev() {
+        if rankCount[i] == 1 {
+            firstKicker = i as i32;
+            break;
+        }
     }
 
     // check for two pairs
     if rankCount[mostCommonRank as usize] == 2 && rankCount[secondMostCommonRank as usize] == 2 {
-        return 200 + mostCommonRank;
+        return 200000 + 13 * 13 * mostCommonRank + 13 * secondMostCommonRank + firstKicker;
+    }
+
+    // find the second and third kicker
+    let mut secondKicker: i32 = 0;
+    for i in (0..firstKicker as usize).rev() {
+        if rankCount[i] == 1 {
+            secondKicker = i as i32;
+            break;
+        }
+    }
+
+    let mut thirdKicker: i32 = 0;
+    for i in (0..secondKicker as usize).rev() {
+        if rankCount[i] == 1 {
+            thirdKicker = i as i32;
+            break;
+        }
     }
 
     // check for pair
     if rankCount[mostCommonRank as usize] == 2 {
-        return 100 + mostCommonRank;
+        return 100000 + 13 * 13 * firstKicker + 13 * secondKicker + thirdKicker;
     }
 
     // return highest card
-    return mostCommonRank;
+    return 13 * 13 * firstKicker + 13 * secondKicker + thirdKicker;
 }
