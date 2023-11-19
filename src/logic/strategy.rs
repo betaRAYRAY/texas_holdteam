@@ -27,16 +27,17 @@ pub fn decide(_table: Json<Table>) -> Bet {
 
     let bet;
     let betType: char;
-    if winProbability * (activePlayerCount as f64) > 1.7 {
+    let riskAdjustedScore: f64 = winProbability * (0.5 * (activePlayerCount as f64) + 0.5);
+    if riskAdjustedScore > 1.4 {
         bet = max(_table.minimum_raise, maxOpponentStack);
         betType = 'R';
-    } else if winProbability * (activePlayerCount as f64) > 1.4 {
+    } else if riskAdjustedScore > 1.2 {
         bet = _table.minimum_raise;
         betType = 'R';
-    } else if winProbability * (activePlayerCount as f64) > 1.2 || us.stack == 0 {
+    } else if riskAdjustedScore > 1.0 || us.stack == 0 {
         bet = _table.minimum_bet;
         betType = 'C';
-    } /*else if winProbability * (activePlayerCount as f64) > 0.9 && us.bet == 0 && _table.minimum_bet == 20 {
+    } /*else if riskAdjustedScore > 0.9 && us.bet == 0 && _table.minimum_bet == 20 {
         bet = _table.minimum_bet;
         betType = 'C';
     }*/ else {
