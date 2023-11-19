@@ -6,21 +6,39 @@ use strum::IntoEnumIterator;
 use std::time::{Duration, Instant};
 
 use crate::models::player::{Player, PlayerStatusEnum};
+use crate::models::table::Table;
+use crate::models::bet::Bet;
 use crate::models::card::Card;
 use crate::models::rank::Rank;
 use crate::models::suit::Suit;
 
-pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
+pub fn decide(_table: Json<Table>) -> Bet {
     let activePlayerCount: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).count() as i32;
     let us: &Player = &_table.players[_table.active_player as usize];
     let hand: &Vec<Card> = &us.cards.as_ref().unwrap();
     let communityCards: &Vec<Card> = &_table.community_cards;
 
-    let simulationStart = Instant::now();
+    let simulationStart: Instant = Instant::now();
     let winProbability: f64 = simulateWinProbability(hand, communityCards, activePlayerCount - 1);
-    let simulationTime = simulationStart.elapsed();
+    let simulationTime: Duration = simulationStart.elapsed();
 
-    println!("Opponent count: {}, community cards: {}, win probability: {}, simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability, simulationTime);
+    let bet;
+    let betType: char;
+    if winProbability > 0.7 / (activePlayerCount as f64) {
+        let maxOpponentStack: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).map(|player| player.stack).max().unwrap_or(0);
+        bet = maxOpponentStack;
+        betType = 'R';
+    } else if winProbability > 0.5 / (activePlayerCount as f64) {
+        bet = _table.minimum_bet;
+        betType = 'C';
+    } else {
+        bet = 0;
+        betType = 'F';
+    }
+
+    println!("Opponent count: {}, community cards: {}, win probability: {}, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability, betType, bet, simulationTime);
+
+    return crate::models::bet::Bet{bet};
 
     //println!("Table: {:?}", _table);
 
