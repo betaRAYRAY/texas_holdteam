@@ -18,6 +18,8 @@ features = []
 
 [dependencies]
 rand="0.8.5"
+strum = "0.25"
+strum_macros = "0.25"
 
 [[bin]]
 edition = "2021"

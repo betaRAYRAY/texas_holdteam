@@ -1,10 +1,27 @@
+#![allow(non_snake_case)]
+
 use rocket::serde::json::Json;
 use rand::prelude::*;
-
+use strum::IntoEnumIterator;
+use std::time::{Duration, Instant};
 
 use crate::models::player::{Player, PlayerStatusEnum};
+use crate::models::card::Card;
+use crate::models::rank::Rank;
+use crate::models::suit::Suit;
 
 pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::Bet {
+    let activePlayerCount: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).count() as i32;
+    let us: &Player = &_table.players[_table.active_player as usize];
+    let hand: &Vec<Card> = &us.cards.as_ref().unwrap();
+    let communityCards: &Vec<Card> = &_table.community_cards;
+
+    let simulationStart = Instant::now();
+    let winProbability: f64 = simulateWinProbability(hand, communityCards, activePlayerCount - 1);
+    let simulationTime = simulationStart.elapsed();
+
+    println!("Opponent count: {}, win probability: {}, simulation time: {:?}", activePlayerCount - 1, winProbability, simulationTime);
+
     //println!("Table: {:?}", _table);
 
     // number of hidden community cards
@@ -353,4 +370,154 @@ pub fn decide(_table: Json<crate::models::table::Table>) -> crate::models::bet::
 
     return crate::models::bet::Bet{bet: bet};
 
+}
+
+
+fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOpponentCount: i32) -> f64 {
+    // create deck with all cards which are not in the given cards
+    let mut deck: Vec<Card> = vec![];
+    for rank in Rank::iter() {
+        for suit in Suit::iter() {
+            let card: Card = Card {rank, suit};
+            if !hand.contains(&card) && !communityCards.contains(&card) {
+                deck.push(card);
+            }
+        }
+    }
+
+    // shuffle remaining cards in deck to enable random card drawing
+    let mut rng = thread_rng();
+    deck.shuffle(&mut rng);
+
+    // simulate 10000 games
+    let mut wins: i32 = 0;
+    'sim: for _i in 0..10000 {
+        // draw remaining community cards from the deck
+        let mut allCommunityCards: Vec<Card> = communityCards.clone();
+        for _j in 0..(5 - communityCards.len()) {
+            allCommunityCards.push(deck.pop().unwrap());
+        }
+
+        let mut ownCards: Vec<Card> = allCommunityCards.clone();
+        ownCards.extend(hand);
+        let ownScore: i32 = evaluateHand(&ownCards);
+
+        for _j in 0..activeOpponentCount {
+            let mut opponentCards: Vec<Card> = allCommunityCards.clone();
+            opponentCards.extend(vec![deck.pop().unwrap(), deck.pop().unwrap()]);
+            
+            let opponentScore: i32 = evaluateHand(&opponentCards);
+            if opponentScore >= ownScore {
+                continue 'sim;
+            }
+        }
+
+        wins += 1;
+    }
+
+    return (wins as f64) / 10000.0;
+}
+
+
+fn evaluateHand(cards: &Vec<Card>) -> i32 {
+    // count number of cards of each rank
+    let mut rankCount: Vec<i32> = vec![0; 13];
+    for card in cards {
+        rankCount[card.rank as usize] += 1;
+    }
+
+    // check for straight/royal flush
+    let mut straightFlushCount: i32 = 0;
+    for i in (0..13).rev() {
+        if rankCount[i] > 0 {
+            straightFlushCount += 1;
+        } else {
+            straightFlushCount = 0;
+        }
+
+        if straightFlushCount == 5 {
+            return 800 + (i as i32);
+        }
+    }
+
+    // find highest count of cards of the same rank
+    let mut mostCommonRank: i32 = 12;
+    for i in (0..12).rev() {
+        if rankCount[i] > rankCount[mostCommonRank as usize] {
+            mostCommonRank = i as i32;
+        }
+    }
+
+    // check for four of a kind
+    if rankCount[mostCommonRank as usize] == 4 {
+        return 700 + mostCommonRank;
+    }
+
+    // find second highest count of cards of the same rank
+    let mut secondMostCommonRank: i32 = if mostCommonRank != 12 { 12 } else { 11 };
+    for i in (0..12).rev() {
+        if rankCount[i] > rankCount[secondMostCommonRank as usize] && i as i32 != mostCommonRank {
+            secondMostCommonRank = i as i32;
+        }
+    }
+
+    // check for full house
+    if rankCount[mostCommonRank as usize] == 3 && rankCount[secondMostCommonRank as usize] == 2 {
+        return 600 + mostCommonRank;
+    }
+
+    // count number of cards of each suit
+    let mut suitCount: Vec<i32> = vec![0; 4];
+    for card in cards {
+        suitCount[card.suit as usize] += 1;
+    }
+
+    // find highest count of cards of the same suit
+    let mut mostCommonSuit: i32 = 0;
+    for i in 1..4 {
+        if suitCount[i] > suitCount[mostCommonSuit as usize] {
+            mostCommonSuit = i as i32;
+        }
+    }
+
+    // check for flush
+    if suitCount[mostCommonSuit as usize] >= 5 {
+        for card in cards.iter().rev() {
+            if card.suit as i32 == mostCommonSuit {
+                return 500 + (card.rank as i32);
+            }
+        }
+    }
+
+    // check for straight
+    let mut straightCount: i32 = 0;
+    for i in (0..13).rev() {
+        if rankCount[i] > 0 {
+            straightCount += 1;
+        } else {
+            straightCount = 0;
+        }
+
+        if straightCount == 5 {
+            return 400 + (i as i32);
+        }
+    }
+
+    // check for three of a kind
+    if rankCount[mostCommonRank as usize] == 3 {
+        return 300 + mostCommonRank;
+    }
+
+    // check for two pairs
+    if rankCount[mostCommonRank as usize] == 2 && rankCount[secondMostCommonRank as usize] == 2 {
+        return 200 + mostCommonRank;
+    }
+
+    // check for pair
+    if rankCount[mostCommonRank as usize] == 2 {
+        return 100 + mostCommonRank;
+    }
+
+    // return highest card
+    return mostCommonRank;
 }
