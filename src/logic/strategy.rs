@@ -4,9 +4,10 @@ use rocket::serde::json::Json;
 use rand::prelude::*;
 use strum::IntoEnumIterator;
 use std::time::{Duration, Instant};
+use std::cmp::{min, max};
 
 use crate::models::player::{Player, PlayerStatusEnum};
-use crate::models::table::Table;
+use crate::models::table::{Table, self};
 use crate::models::bet::Bet;
 use crate::models::card::Card;
 use crate::models::rank::Rank;
@@ -22,13 +23,17 @@ pub fn decide(_table: Json<Table>) -> Bet {
     let winProbability: f64 = simulateWinProbability(hand, communityCards, activePlayerCount - 1);
     let simulationTime: Duration = simulationStart.elapsed();
 
+    let maxOpponentStack: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).map(|player| player.stack).max().unwrap_or(0);
+
     let bet;
     let betType: char;
     if winProbability > 1.5 / (activePlayerCount as f64) {
-        let maxOpponentStack: i32 = _table.players.iter().filter(|player| player.status == PlayerStatusEnum::ACTIVE).map(|player| player.stack).max().unwrap_or(0);
-        bet = maxOpponentStack;
+        bet = max(_table.minimum_raise, maxOpponentStack);
         betType = 'R';
-    } else if winProbability > 1.0 / (activePlayerCount as f64) {
+    } else if winProbability > 1.2 / (activePlayerCount as f64) {
+        bet = _table.minimum_raise;
+        betType = 'R';
+    } else if winProbability > 0.9 / (activePlayerCount as f64) {
         bet = _table.minimum_bet;
         betType = 'C';
     } else {
@@ -36,7 +41,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
         betType = 'F';
     }
 
-    println!("Opponent count: {}, community cards: {}, win probability: {}, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability, betType, bet, simulationTime);
+    println!("Opponent count: {}, community cards: {}, win probability: {}%, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability * 100.0, betType, bet, simulationTime);
 
     return crate::models::bet::Bet{bet};
 
@@ -222,7 +227,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
 
     let nemesis_all_in : bool = nemesis_bet == nemesis.unwrap().stack;
 
-    let max_bet = core::cmp::max(core::cmp::min(max_opponent_stack, us.stack), min_bet);
+    let max_bet = max(min(max_opponent_stack, us.stack), min_bet);
 
 
     let mut highest_card: i32 = 0;
