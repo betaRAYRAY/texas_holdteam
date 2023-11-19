@@ -30,10 +30,13 @@ pub fn decide(_table: Json<Table>) -> Bet {
     if winProbability > 1.5 / (activePlayerCount as f64) {
         bet = max(_table.minimum_raise, maxOpponentStack);
         betType = 'R';
-    } else if winProbability > 1.2 / (activePlayerCount as f64) {
+    } else if winProbability > 1.3 / (activePlayerCount as f64) {
         bet = _table.minimum_raise;
         betType = 'R';
-    } else if winProbability > 0.9 / (activePlayerCount as f64) {
+    } else if winProbability > 1.1 / (activePlayerCount as f64) {
+        bet = _table.minimum_bet;
+        betType = 'C';
+    } else if winProbability > 0.9 / (activePlayerCount as f64) && us.bet == 0 && _table.minimum_bet == 20 {
         bet = _table.minimum_bet;
         betType = 'C';
     } else {
@@ -41,7 +44,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
         betType = 'F';
     }
 
-    println!("Opponent count: {}, community cards: {}, win probability: {}%, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability * 100.0, betType, bet, simulationTime);
+    println!("Opponent count: {}, community cards: {}, win probability: {:.1}%, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability * 100.0, betType, bet, simulationTime);
 
     return crate::models::bet::Bet{bet};
 
