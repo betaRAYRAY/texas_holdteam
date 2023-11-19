@@ -33,7 +33,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
     } else if winProbability > 1.3 / (activePlayerCount as f64) {
         bet = _table.minimum_raise;
         betType = 'R';
-    } else if winProbability > 1.1 / (activePlayerCount as f64) {
+    } else if winProbability > 1.0 / (activePlayerCount as f64) {
         bet = _table.minimum_bet;
         betType = 'C';
     } else if winProbability > 0.9 / (activePlayerCount as f64) && us.bet == 0 && _table.minimum_bet == 20 {
