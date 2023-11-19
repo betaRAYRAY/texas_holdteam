@@ -43,7 +43,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
     } else if (riskAdjustedScore > -0.15 && !(activePlayerCount <= 4 && us.stack >= 300)) || us.stack == 0 {
         bet = _table.minimum_bet;
         betType = 'C';
-    } else if winProbability / (activePlayerCount as f64) > 0.5 && communityCards.len() > 0 {
+    } else if winProbability / (activePlayerCount as f64) > 0.35 && communityCards.len() > 0 {
         bet = _table.minimum_bet;
         betType = 'C';
     } /*else if riskAdjustedScore > -0.1 && us.bet == 0 && _table.minimum_bet == 20 {
