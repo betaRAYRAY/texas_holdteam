@@ -48,7 +48,7 @@ pub fn decide(_table: Json<Table>) -> Bet {
         betType = 'F';
     }
 
-    println!("Opponent count: {}, community cards: {}, win probability: {:.1}%, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability * 100.0, betType, bet, simulationTime);
+    println!("Opponent count: {}, community cards: {}, win probability: {:.1}%, risk adjusted score: {:.3}, bet: {}{} simulation time: {:?}", activePlayerCount - 1, communityCards.len(), winProbability * 100.0, riskAdjustedScore, betType, bet, simulationTime);
 
     return crate::models::bet::Bet{bet};
 
