@@ -387,9 +387,10 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
 
     let mut rng = thread_rng();
 
-    // simulate 10000 games
+    // simulate n games
+    let n: i32 = 100000;
     let mut wins: i32 = 0;
-    'sim: for _i in 0..10000 {
+    'sim: for _i in 0..n {
         let mut deckTmp: Vec<Card> = deck.clone();
 
         // shuffle remaining cards in deck to enable random card drawing
@@ -418,7 +419,7 @@ fn simulateWinProbability(hand: &Vec<Card>, communityCards: &Vec<Card>, activeOp
         wins += 1;
     }
 
-    return (wins as f64) / 10000.0;
+    return (wins as f64) / (n as f64);
 }
 
 
